@@ -246,7 +246,7 @@ public class SysDateServiceImpl implements SysDateService {
 
         // 2 查询统计数据
         QueryWrapper<VideoStat> statWrapper = new QueryWrapper<>();
-        statWrapper.eq("id", videoId);
+        statWrapper.eq("video_id", videoId);
 
         VideoStat stat = videoStatMapper.selectOne(statWrapper);
 

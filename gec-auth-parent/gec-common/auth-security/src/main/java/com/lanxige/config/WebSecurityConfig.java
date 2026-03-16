@@ -78,6 +78,7 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/admin/system/sysMovie/getHotWatchVideoInfo").permitAll()
                 .antMatchers("/admin/system/sysMovie/getHotVideoInfo").permitAll()
                 .antMatchers("/admin/system/sysDate/singelMovieDetail").permitAll()
+                .antMatchers("/admin/system/sysUser/registerUser").permitAll()
 
                 // 这里意思是其它所有接口需要认证才能访问
                 .anyRequest().authenticated()

@@ -44,7 +44,7 @@ public class RecordOpenLogController {
         if (b) {
             return Result.ok();
         } else {
-            return Result.fail();
+            return Result.fail("删除失败");
 
         }
     }

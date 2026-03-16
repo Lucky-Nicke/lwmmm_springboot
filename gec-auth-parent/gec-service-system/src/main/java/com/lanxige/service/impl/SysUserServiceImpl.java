@@ -207,7 +207,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         //MD5加密密码
         String passwordWithMD5 = MD5Helper.md5(sysUser.getPassword());
         sysUser.setPassword(passwordWithMD5);
-        sysUser.setHeadUrl("http://file.lanxige.club/img/yq-third-lwmmm/Default/identicon.png");
+        if (sysUser.getHeadUrl() == null) {
+            sysUser.setHeadUrl("http://file.lanxige.club/img/yq-third-lwmmm/Default/identicon.png");
+        }
 
         return save(sysUser);
     }
@@ -227,7 +229,7 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         //当前权限控制使用不到，我们暂时忽略
         map.put("name", sysUser.getName());
         map.put("avatar", sysUser.getHeadUrl());
-        map.put("desc", sysUser.getDescription());
+        map.put("description", sysUser.getDescription());
         map.put("status", sysUser.getStatus());
         map.put("roleList", sysUser.getRoleList());
         map.put("phone", sysUser.getPhone());

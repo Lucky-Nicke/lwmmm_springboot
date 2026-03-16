@@ -21,6 +21,8 @@ public class VideoLikeLog {
 
     private Long videoId;
 
+    private Long commentId;
+
     // 1点赞 0取消
     private Integer status;
 

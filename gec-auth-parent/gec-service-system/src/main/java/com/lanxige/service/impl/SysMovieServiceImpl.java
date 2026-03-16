@@ -257,11 +257,21 @@ public class SysMovieServiceImpl extends ServiceImpl<SysMovieMapper, SysMovie> i
 
         // 1. 查询点赞记录
         LambdaQueryWrapper<VideoLikeLog> wrapper = new LambdaQueryWrapper<>();
-        wrapper.eq(VideoLikeLog::getUserId, req.getUserId())
-                .eq(VideoLikeLog::getVideoId, req.getVideoId())
-                .eq(VideoLikeLog::getType, req.getLikeType())
-                .eq(VideoLikeLog::getIsDeleted, 0)
-                .last("limit 1");
+        if ("comment".equals(req.getLikeType())){
+            wrapper.eq(VideoLikeLog::getUserId, req.getUserId())
+                    .eq(VideoLikeLog::getVideoId, req.getVideoId())
+                    .eq(VideoLikeLog::getType, req.getLikeType())
+                    .eq(VideoLikeLog::getCommentId, req.getCommentId())
+                    .eq(VideoLikeLog::getIsDeleted, 0)
+                    .last("limit 1");
+        }else{
+            wrapper.eq(VideoLikeLog::getUserId, req.getUserId())
+                    .eq(VideoLikeLog::getVideoId, req.getVideoId())
+                    .eq(VideoLikeLog::getType, req.getLikeType())
+                    .eq(VideoLikeLog::getIsDeleted, 0)
+                    .last("limit 1");
+        }
+
 
         VideoLikeLog likeLog = videoLikeLogMapper.selectOne(wrapper);
 
@@ -276,6 +286,7 @@ public class SysMovieServiceImpl extends ServiceImpl<SysMovieMapper, SysMovie> i
             log.setUserId(req.getUserId());
             log.setVideoId(req.getVideoId());
             log.setType(req.getLikeType());
+            log.setCommentId(req.getCommentId());
             log.setStatus(1);
             videoLikeLogMapper.insert(log);
 
