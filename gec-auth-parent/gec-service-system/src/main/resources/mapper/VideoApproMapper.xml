@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.lanxige.mapper.video.VideoApproMapper">
+
+    <resultMap id="BaseResultMap" type="com.lanxige.model.video.VideoAppro">
+        <id column="id" property="id" />
+        <result column="video_id" property="videoId" />
+        <result column="appro_status" property="approStatus" />
+        <result column="appro_by" property="approBy" />
+        <result column="appro_time" property="approTime" />
+        <result column="appro_desc" property="approDesc" />
+        <result column="create_time" property="createTime" />
+        <result column="update_time" property="updateTime" />
+        <result column="upload_by" property="uploadBy" />
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id, video_id, appro_status, appro_by, appro_time, appro_desc, create_time, update_time,upload_by
+    </sql>
+
+    <!-- 可自定义查询 -->
+    <select id="selectByVideoId" resultMap="BaseResultMap">
+        SELECT
+        <include refid="Base_Column_List"/>
+        FROM video_appro
+        WHERE videoId = #{videoId}
+    </select>
+
+</mapper>

@@ -6,22 +6,27 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.lanxige.Req.ApprovalReq;
 import com.lanxige.Req.SendCommentReq;
 import com.lanxige.Req.SendDanMuReq;
 import com.lanxige.Req.SendLikeReq;
 import com.lanxige.Rsp.AllVideoInfoRsp;
+import com.lanxige.Rsp.VideoApproRsp;
 import com.lanxige.mapper.system.SysMovieMapper;
 import com.lanxige.mapper.video.*;
 import com.lanxige.model.system.SysMovie;
 import com.lanxige.model.video.*;
 import com.lanxige.model.vo.SysMovieQueryVo;
 import com.lanxige.service.SysMovieService;
+import com.lanxige.util.JwtHelper;
 import com.lanxige.utils.VodTemplate;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -49,6 +54,9 @@ public class SysMovieServiceImpl extends ServiceImpl<SysMovieMapper, SysMovie> i
 
     @Autowired
     private VideoWatchLogMapper videoWatchLogMapper;
+
+    @Autowired
+    private VideoApproMapper videoApproMapper;
 
     @Override
     public IPage<SysMovie> selectPage(IPage<SysMovie> p1, SysMovieQueryVo sysMovieQueryVo) {
@@ -417,6 +425,121 @@ public class SysMovieServiceImpl extends ServiceImpl<SysMovieMapper, SysMovie> i
             log.setVideoId(videoId);
             videoWatchLogMapper.insert(log);
         }
+    }
+
+    @Override
+    public int userUploadVideo(SysMovie req, HttpServletRequest httpServletRequest) {
+        // 从token获取用户信息
+        String token = httpServletRequest.getHeader("token");
+        String userId = JwtHelper.getId(token);
+        String username = JwtHelper.getUsername(token);
+
+        // 设置电影基本信息
+        req.setIsApproval("0"); // 未审核
+
+        // 插入 sys_movie 表
+        sysMovieMapper.insert(req);
+
+        // 插入审核表 video_appro
+        VideoAppro videoAppro = new VideoAppro();
+        videoAppro.setVideoId(req.getId()); // insert后mybatis-plus会回填id
+        videoAppro.setApproStatus("DOING");
+        videoAppro.setUploadBy(userId);
+
+        videoApproMapper.insert(videoAppro);
+
+        return 1;
+    }
+
+    @Override
+    public List<VideoApproRsp> showApproveRecord(HttpServletRequest httpServletRequest) {
+        // 从token获取用户id
+        String token = httpServletRequest.getHeader("token");
+        String userId = JwtHelper.getId(token);
+
+        // 查询该用户上传的审核记录
+        LambdaQueryWrapper<VideoAppro> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(VideoAppro::getUploadBy, userId);
+        List<VideoAppro> list = videoApproMapper.selectList(wrapper);
+
+        // 转换为rsp
+        return list.stream().map(item -> {
+            VideoApproRsp rsp = new VideoApproRsp();
+            BeanUtils.copyProperties(item, rsp);
+            return rsp;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public List<VideoApproRsp> showAdminApproveRecord(HttpServletRequest httpServletRequest) {
+        LambdaQueryWrapper<VideoAppro> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(VideoAppro::getApproStatus, "DOING");
+        List<VideoAppro> list = videoApproMapper.selectList(wrapper);
+        return list.stream().map(item -> {
+            VideoApproRsp rsp = new VideoApproRsp();
+            BeanUtils.copyProperties(item, rsp);
+            return rsp;
+        }).collect(Collectors.toList());
+    }
+
+    @Override
+    public int doApproval(ApprovalReq req, HttpServletRequest httpServletRequest) {
+        String token = httpServletRequest.getHeader("token");
+        String userId = JwtHelper.getId(token);
+
+        // 查出当前审核记录
+        LambdaQueryWrapper<VideoAppro> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(VideoAppro::getVideoId, req.getVideoId());
+        VideoAppro videoAppro = videoApproMapper.selectOne(wrapper);
+
+        if (videoAppro == null) {
+            throw new RuntimeException("审核记录不存在");
+        }
+
+        // 如果审核通过，同步更新 sys_movie 的is_approval
+        if ("SUCC".equals(req.getApproStatus())) {
+            SysMovie sysMovie = new SysMovie();
+            sysMovie.setId(req.getVideoId());
+            sysMovie.setIsApproval("1");
+            sysMovieMapper.updateById(sysMovie);
+        } else if ("FAIL".equals(req.getApproStatus())) {
+            SysMovie sysMovie = new SysMovie();
+            sysMovie.setId(req.getVideoId());
+            sysMovie.setIsApproval("0");
+            sysMovieMapper.updateById(sysMovie);
+        }
+
+        return 1;
+    }
+
+    @Override
+    public int doUserCancelApproval(ApprovalReq req, HttpServletRequest httpServletRequest) {
+        String token = httpServletRequest.getHeader("token");
+        String userId = JwtHelper.getId(token);
+        // 只能取消自己上传的审核
+        LambdaQueryWrapper<VideoAppro> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(VideoAppro::getVideoId, req.getVideoId()).eq(VideoAppro::getUploadBy, userId);
+        VideoAppro videoAppro = videoApproMapper.selectOne(wrapper);
+        if (videoAppro == null) {
+            throw new RuntimeException("审核记录不存在或无权操作");
+        }
+        // 只有DOING状态才能取消
+        if (!"DOING".equals(videoAppro.getApproStatus())) {
+            throw new RuntimeException("当前状态不可取消");
+        }
+        videoApproMapper.deleteById(videoAppro.getId());
+        // 同步删除 sys_movie
+        sysMovieMapper.deleteById(req.getVideoId());
+        return 1;
+    }
+
+    @Override
+    public List<SysMovie> showMyUploadVideo(HttpServletRequest httpServletRequest) {
+        String token = httpServletRequest.getHeader("token");
+        String username = JwtHelper.getUsername(token);
+        LambdaQueryWrapper<SysMovie> wrapper = new LambdaQueryWrapper<>();
+        wrapper.eq(SysMovie::getDirector, username).eq(SysMovie::getIsDeleted, 0);
+        return sysMovieMapper.selectList(wrapper);
     }
 }
 

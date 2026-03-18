@@ -29,6 +29,12 @@ public class TokenAuthenticationFliter extends OncePerRequestFilter {
         this.redisTemplate = redisTemplate;
     }
 
+    public class LoginException extends RuntimeException {
+        public LoginException(String message) {
+            super(message);
+        }
+    }
+
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         logger.info("uri:" + request.getRequestURI());
@@ -73,6 +79,10 @@ public class TokenAuthenticationFliter extends OncePerRequestFilter {
         }
 
         logger.info("最终token: " + token);
+
+        if (token == null || "undefined".equals(token)) {
+            throw new LoginException("请先登录");
+        }
 
         if (!StringUtils.isNullOrEmpty(token)) {
 

@@ -23,6 +23,8 @@ public class SysMovie extends BaseEntity {
 
     private String director;//导演
 
+    private String isApproval;//审核状态
+
     private String image;//缩略图
 
     private String playId;//播放id

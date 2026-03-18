@@ -2,13 +2,16 @@ package com.lanxige.service;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.lanxige.Req.ApprovalReq;
 import com.lanxige.Req.SendCommentReq;
 import com.lanxige.Req.SendDanMuReq;
 import com.lanxige.Req.SendLikeReq;
 import com.lanxige.Rsp.AllVideoInfoRsp;
+import com.lanxige.Rsp.VideoApproRsp;
 import com.lanxige.model.system.SysMovie;
 import com.lanxige.model.vo.SysMovieQueryVo;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;
 import java.util.List;
 
@@ -89,5 +92,23 @@ public interface SysMovieService extends IService<SysMovie> {
      * @param userId 用户id
      */
     void recordVideoPV(Long id, Long userId);
+
+    // 用户上传视频
+    int userUploadVideo(SysMovie req, HttpServletRequest httpServletRequest);
+
+    // 用户取消上传视频
+    List<VideoApproRsp> showApproveRecord(HttpServletRequest httpServletRequest);
+
+    // 管理员审核视频
+    List<VideoApproRsp> showAdminApproveRecord(HttpServletRequest httpServletRequest);
+
+    // 管理员审核视频
+    int doApproval(ApprovalReq approvalReq, HttpServletRequest httpServletRequest);
+
+    // 用户取消上传视频
+    int doUserCancelApproval(ApprovalReq approvalReq, HttpServletRequest httpServletRequest);
+
+    // 用户查看自己上传的视频
+    List<SysMovie> showMyUploadVideo(HttpServletRequest httpServletRequest);
 }
 
