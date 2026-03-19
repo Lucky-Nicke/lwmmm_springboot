@@ -116,6 +116,8 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
         //当前权限控制使用不到，我们暂时忽略
         map.put("name", sysUser.getName());
+        map.put("username", sysUser.getUsername());
+        map.put("userId", sysUser.getId());
         map.put("avatar", sysUser.getHeadUrl());
 
         map.put("buttons", permsList);

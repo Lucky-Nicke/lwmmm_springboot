@@ -2,6 +2,7 @@ package com.lanxige.Rsp;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 /**
@@ -9,13 +10,15 @@ import java.util.Date;
  */
 @Data
 public class VideoApproRsp {
-    private Integer id;
-    private Integer videoId;
+    private Long id;
+    private Long videoId;
+    private String videoName;
     private String approStatus;
     private String approBy;
     private Date approTime;
     private String approDesc;
-    private Date createTime;
-    private Date updateTime;
     private String uploadBy;
+    private LocalDateTime createTime;
+    private LocalDateTime updateTime;
+    private String image; // 封面
 }
