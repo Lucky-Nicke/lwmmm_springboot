@@ -21,4 +21,7 @@ public class VideoApproRsp {
     private LocalDateTime createTime;
     private LocalDateTime updateTime;
     private String image; // 封面
+    private String cid;//所属栏目
+    private String description;//描述
+    private String director;//导演
 }

@@ -2,10 +2,7 @@ package com.lanxige.controller;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
-import com.lanxige.Req.RecordVideoPVReq;
-import com.lanxige.Req.SendCommentReq;
-import com.lanxige.Req.SendDanMuReq;
-import com.lanxige.Req.SendLikeReq;
+import com.lanxige.Req.*;
 import com.lanxige.Rsp.AllVideoInfoRsp;
 import com.lanxige.eurm.BusinessType;
 import com.lanxige.model.system.SysMovie;
@@ -67,7 +64,7 @@ public class SysMovieController {
             businessType = BusinessType.INSERT,
             requestMethod = "Post")
     @PostMapping("/addMovie")
-    public Result addRole(@RequestBody SysMovie sysMovie) {
+    public Result addRole(@RequestBody AddSysMovieReq sysMovie) {
         boolean res = this.sysMovieService.saveMovieInfo(sysMovie);
 
         if (res) {

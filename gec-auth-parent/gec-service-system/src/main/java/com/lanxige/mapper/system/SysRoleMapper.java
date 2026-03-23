@@ -8,8 +8,18 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 @Mapper
 public interface SysRoleMapper extends BaseMapper<SysRole> {
-    public IPage<SysRole> selectPage(IPage<SysRole> page1,@Param("vo") SysRoleQueryVo roleQueryVo);
+    IPage<SysRole> selectPage(IPage<SysRole> page1, @Param("vo") SysRoleQueryVo roleQueryVo);
+
+    /**
+     * 查询角色通过用户id
+     *
+     * @param userId 用户id
+     * @return 角色列表
+     */
+    List<SysRole> selectRoleListByUserId(Long userId);
 }

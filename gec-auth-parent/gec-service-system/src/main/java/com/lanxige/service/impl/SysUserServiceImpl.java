@@ -30,6 +30,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -114,11 +115,18 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         List<RouterVo> routerVoList = iSysMenuService.findUserMenuList(sysUser.getId());
         List<String> permsList = iSysMenuService.findUserPermsList(sysUser.getId());
 
+        //获取当前登录的用户role
+        List<SysRole> roleList = sysRoleMapper.selectRoleListByUserId(sysUser.getId());
+        List<String> roleCodes = roleList.stream()
+                .map(SysRole::getRoleCode)
+                .collect(Collectors.toList());
+
         //当前权限控制使用不到，我们暂时忽略
         map.put("name", sysUser.getName());
         map.put("username", sysUser.getUsername());
         map.put("userId", sysUser.getId());
         map.put("avatar", sysUser.getHeadUrl());
+        map.put("roles", roleCodes);
 
         map.put("buttons", permsList);
         map.put("routers", routerVoList);
@@ -155,8 +163,6 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         log.info("用户名：{}，密码：{}", username, passwordWithMD5);
 
         // 开始修改密码
-        QueryWrapper<SysUser> qw2 = new QueryWrapper<>();
-        qw2.eq("username", username);
         String newPasswordWithMD5 = MD5Helper.md5(newPwd);
         sysUser.setPassword(newPasswordWithMD5);
 

@@ -204,7 +204,7 @@ public class SysDateServiceImpl implements SysDateService {
         videoStatMapper.update(
                 null,
                 new LambdaUpdateWrapper<VideoStat>()
-                        .eq(VideoStat::getId, videoId)
+                        .eq(VideoStat::getVideoId, videoId)
                         .setSql("visit_pv = visit_pv + 1")
         );
 

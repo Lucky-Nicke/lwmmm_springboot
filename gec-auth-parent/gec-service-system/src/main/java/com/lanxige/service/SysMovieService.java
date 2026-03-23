@@ -17,7 +17,7 @@ public interface SysMovieService extends IService<SysMovie> {
     /**
      * 保存电影信息
      */
-    boolean saveMovieInfo(SysMovie sysMovie);
+    boolean saveMovieInfo(AddSysMovieReq sysMovie);
 
     /**
      * 根据id查询电影信息

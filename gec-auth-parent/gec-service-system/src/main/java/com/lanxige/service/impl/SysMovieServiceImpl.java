@@ -63,16 +63,34 @@ public class SysMovieServiceImpl extends ServiceImpl<SysMovieMapper, SysMovie> i
      * 保存电影信息
      */
     @Override
-    public boolean saveMovieInfo(SysMovie sysMovie) {
+    public boolean saveMovieInfo(AddSysMovieReq sysMovie) {
         log.info("保存电影信息，参数：{}", sysMovie);
 
-        // 保存至video_stat表
+        // 1. 转换对象
+        SysMovie movie = new SysMovie();
+        BeanUtils.copyProperties(sysMovie, movie);
+        movie.setIsApproval("1");
+        movie.setDirector(sysMovie.getUsername());
+
+        // 2. 插入 sys_movie
+        int i = sysMovieMapper.insert(movie);
+        log.info("保存电影信息成功，结果：{}", i);
+
+        // 3. 获取自增ID（关键点！）
+        String movieId = String.valueOf(movie.getId());
+        log.info("生成的movieId：{}", movieId);
+
+        // 4. 插入 video_stat
         VideoStat videoStat = new VideoStat();
-        videoStat.setId(sysMovie.getId());
+        videoStat.setVideoId(movieId);
+        videoStat.setVisitPv(0);
+        videoStat.setLikeCount(0);
+        videoStat.setPlayCount(0);
+
         int insert = videoStatMapper.insert(videoStat);
         log.info("保存至video_stat表，结果：{}", insert);
 
-        return this.save(sysMovie);
+        return i > 0 && insert > 0;
     }
 
     /**
@@ -410,7 +428,7 @@ public class SysMovieServiceImpl extends ServiceImpl<SysMovieMapper, SysMovie> i
         videoStatMapper.update(
                 null,
                 new LambdaUpdateWrapper<VideoStat>()
-                        .eq(VideoStat::getId, videoId)
+                        .eq(VideoStat::getVideoId, videoId)
                         .setSql("play_count = play_count + 1")
         );
 
@@ -462,6 +480,9 @@ public class SysMovieServiceImpl extends ServiceImpl<SysMovieMapper, SysMovie> i
             // 查询封面
             SysMovie movie = sysMovieMapper.selectById(item.getVideoId());
             if (movie != null) {
+                rsp.setDirector(movie.getDirector());
+                rsp.setCid(movie.getCid());
+                rsp.setDescription(movie.getDescription());
                 rsp.setImage(movie.getImage());
                 rsp.setVideoName(movie.getName());
             }
@@ -481,6 +502,9 @@ public class SysMovieServiceImpl extends ServiceImpl<SysMovieMapper, SysMovie> i
             BeanUtils.copyProperties(item, rsp);
 
             SysMovie sysMovie = sysMovieMapper.selectById(item.getVideoId());
+            rsp.setDirector(sysMovie.getDirector());
+            rsp.setCid(sysMovie.getCid());
+            rsp.setDescription(sysMovie.getDescription());
             rsp.setVideoName(sysMovie.getName());
             rsp.setImage(sysMovie.getImage());
 
