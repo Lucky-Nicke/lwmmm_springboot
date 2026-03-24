@@ -8,7 +8,6 @@ import com.lanxige.eurm.BusinessType;
 import com.lanxige.model.system.SysUser;
 import com.lanxige.model.vo.SysUserQueryVo;
 import com.lanxige.service.SysUserService;
-import com.lanxige.util.JwtHelper;
 import com.lanxige.util.Result;
 import com.lanxige.utils.aop.OpenLog;
 import io.swagger.annotations.Api;
@@ -18,7 +17,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -137,11 +135,9 @@ public class SysUserController {
     }
 
     @ApiOperation("查询用户信息")
-    @GetMapping(value = "/info")
-    public Result info(HttpServletRequest request) {
-        String token = request.getHeader("token");
-        String username = JwtHelper.getUsername(token);
-        Map<String, Object> map = sysUserService.getUserLessInfo(username);
+    @GetMapping(value = "/info/{userId}")
+    public Result info(@PathVariable Long userId) {
+        Map<String, Object> map = sysUserService.getUserLessInfo(userId);
         return Result.ok(map);
     }
 
@@ -163,19 +159,15 @@ public class SysUserController {
 
     @ApiOperation("查询用户观看记录")
     @GetMapping(value = "/userWatchLog")
-    public Result userWatchLog(HttpServletRequest request) {
-        String token = request.getHeader("token");
-        String id = JwtHelper.getId(token);
-        List<UserInfoRsp> list = sysUserService.userWatchLog(id);
+    public Result userWatchLog(String userId) {
+        List<UserInfoRsp> list = sysUserService.userWatchLog(userId);
         return Result.ok(list);
     }
 
     @ApiOperation("查询用户点赞列表")
     @GetMapping(value = "/userLikeLog")
-    public Result userLikeLog(HttpServletRequest request) {
-        String token = request.getHeader("token");
-        String id = JwtHelper.getId(token);
-        List<UserInfoRsp> list = sysUserService.userLikeLog(id);
+    public Result userLikeLog(String userId) {
+        List<UserInfoRsp> list = sysUserService.userLikeLog(userId);
         return Result.ok(list);
     }
 }

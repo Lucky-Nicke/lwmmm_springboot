@@ -50,10 +50,10 @@ public class Knife4jConfig {
     private ApiInfo adminApiInfo() {
 
         return new ApiInfoBuilder()
-                .title("爱观影影视平台-API文档")
+                .title("影视管理系统-API文档")
                 .description("本文档描述了影视平台接口定义")
                 .version("1.0")
-                .contact(new Contact("gec", "http://qq.com", "dafei@gec.com"))
+                .contact(new Contact("Lucky_Nicke", "https://github.com/Lucky-Nicke", "glucky_nicke@gmail.com"))
                 .build();
     }
 }

@@ -286,6 +286,7 @@ public class SysDateServiceImpl implements SysDateService {
         QueryWrapper<VideoComment> commentWrapper = new QueryWrapper<>();
         commentWrapper.eq("video_id", videoId)
                 .eq("status", 1)
+                .eq("is_deleted",0)
                 .orderByDesc("create_time");
 
         List<VideoComment> commentList = videoCommentMapper.selectList(commentWrapper);
@@ -399,6 +400,7 @@ public class SysDateServiceImpl implements SysDateService {
                     .eq("root_id", commentId)       // 删除所有以该评论为根的子评论
                     .or()
                     .eq("parent_id", commentId)     // 删除所有直接回复该评论的子评论 (作为备选，以防root_id没覆盖全)
+                    .set("status",2)
                     .set("is_deleted", 1);
 
             int updatedRows = videoCommentMapper.update(null, updateWrapper);

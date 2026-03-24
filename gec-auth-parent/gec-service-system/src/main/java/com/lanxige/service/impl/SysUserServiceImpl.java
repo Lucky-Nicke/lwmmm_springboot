@@ -225,14 +225,16 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
     /**
      * 获取用户信息
      *
-     * @param username 用户名
+     * @param userId 用户名
      * @return 用户信息
      */
     @Override
-    public Map<String, Object> getUserLessInfo(String username) {
+    public Map<String, Object> getUserLessInfo(Long userId) {
 
         Map<String, Object> map = new HashMap<>();
-        SysUser sysUser = this.getUserInfoUserName(username);
+        QueryWrapper<SysUser> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("id", userId);
+        SysUser sysUser = this.baseMapper.selectOne(queryWrapper);
 
         //当前权限控制使用不到，我们暂时忽略
         map.put("name", sysUser.getName());

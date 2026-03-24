@@ -64,10 +64,10 @@ public interface SysUserService extends IService<SysUser> {
     /**
      * 获取用户信息
      *
-     * @param username 用户名
+     * @param userId 用户id
      * @return 用户信息
      */
-    Map<String, Object> getUserLessInfo(String username);
+    Map<String, Object> getUserLessInfo(Long userId);
 
     boolean registerUser(SysUser sysUser);
 
