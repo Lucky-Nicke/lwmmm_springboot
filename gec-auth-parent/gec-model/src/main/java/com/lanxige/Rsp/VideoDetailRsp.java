@@ -70,6 +70,11 @@ public class VideoDetailRsp {
     private String creatorAvatar;
 
     /**
+     * 简介
+     */
+    private String description;
+
+    /**
      * 播放id
      */
     private HashMap<String, Object> playId;

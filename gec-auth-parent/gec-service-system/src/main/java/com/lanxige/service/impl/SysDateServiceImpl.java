@@ -216,7 +216,7 @@ public class SysDateServiceImpl implements SysDateService {
 
         String director = movie.getDirector();
         QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.eq("username",director);
+        queryWrapper.eq("name",director);
         SysUser sysCreateUser = sysUserMapper.selectOne(queryWrapper);
 
         rsp.setVideoId(movie.getId());
@@ -224,6 +224,7 @@ public class SysDateServiceImpl implements SysDateService {
         rsp.setImage(movie.getImage());
         rsp.setCategory(movie.getCid());
         rsp.setPublishTime(movie.getCreateTime());
+        rsp.setDescription(movie.getDescription());
 
         // 调用阿里云服务获取播放秘钥
         String playAuth;
