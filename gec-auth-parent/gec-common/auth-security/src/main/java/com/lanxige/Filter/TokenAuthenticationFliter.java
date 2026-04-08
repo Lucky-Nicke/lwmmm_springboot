@@ -80,10 +80,6 @@ public class TokenAuthenticationFliter extends OncePerRequestFilter {
 
         logger.info("最终token: " + token);
 
-        if (token == null || "undefined".equals(token)) {
-            throw new LoginException("请先登录");
-        }
-
         if (!StringUtils.isNullOrEmpty(token)) {
 
             String username = JwtHelper.getUsername(token);
