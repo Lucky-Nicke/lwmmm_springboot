@@ -216,7 +216,7 @@ public class SysDateServiceImpl implements SysDateService {
 
         String director = movie.getDirector();
         QueryWrapper queryWrapper = new QueryWrapper();
-        queryWrapper.eq("name",director);
+        queryWrapper.eq("username",director);
         SysUser sysCreateUser = sysUserMapper.selectOne(queryWrapper);
 
         rsp.setVideoId(movie.getId());
