@@ -236,6 +236,11 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
         queryWrapper.eq("id", userId);
         SysUser sysUser = this.baseMapper.selectOne(queryWrapper);
 
+        if (sysUser == null) {
+            map.put("name", "已注销账户");
+            return map;
+        }
+
         //当前权限控制使用不到，我们暂时忽略
         map.put("name", sysUser.getName());
         map.put("avatar", sysUser.getHeadUrl());
@@ -268,7 +273,9 @@ public class SysUserServiceImpl extends ServiceImpl<SysUserMapper, SysUser> impl
 
         // 2 设置用户默认信息
         sysUser.setStatus(1);
-        sysUser.setName("用户"+UUID.randomUUID().toString().substring(0, 6));
+        if (sysUser.getName() == null || sysUser.getName().trim().isEmpty()) {
+            sysUser.setName("用户" + UUID.randomUUID().toString().substring(0, 6));
+        }
 
         // 3 密码加密
         sysUser.setPassword(passwordEncoder.encode(sysUser.getPassword()));

@@ -142,9 +142,6 @@ public class SysUserController {
     }
 
     // 添加用户
-    @OpenLog(title = "用户管理-注册",
-            businessType = BusinessType.INSERT,
-            requestMethod = "Post")
     @ApiOperation("注册用户")
     @PostMapping("/registerUser")
     public Result registerUser(@Validated @RequestBody SysUser sysUser) {

@@ -1,6 +1,7 @@
 package com.lanxige.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.UpdateWrapper;
 import com.lanxige.Dto.VideoCommentDTO;
@@ -208,8 +209,13 @@ public class SysDateServiceImpl implements SysDateService {
                         .setSql("visit_pv = visit_pv + 1")
         );
 
-        // 1 查询视频基本信息
-        SysMovie movie = sysMovieMapper.selectById(videoId);
+        // 1 查询视频基本信息（排除下架视频 is_approval=2 和已删除）
+        SysMovie movie = sysMovieMapper.selectOne(
+                new LambdaQueryWrapper<SysMovie>()
+                        .eq(SysMovie::getId, videoId)
+                        .ne(SysMovie::getIsApproval, "2")
+                        .eq(SysMovie::getIsDeleted, 0)
+        );
         if (movie == null) {
             return rsp;
         }
@@ -306,11 +312,9 @@ public class SysDateServiceImpl implements SysDateService {
             dto.setParentId(c.getParentId());
             dto.setRootId(c.getRootId());
 
-            // 这里用户名头像应该查用户表，这里先模拟
-            dto.setUserId("用户:" + c.getUserId());
-            log.info("用户:{}", c.getUserId());
             SysUser sysUser = sysUserMapper.selectById(c.getUserId());
-            dto.setAvatar(sysUser.getHeadUrl());
+            dto.setUserId(sysUser != null ? sysUser.getName() : "已注销账户");
+            dto.setAvatar(sysUser != null ? sysUser.getHeadUrl() : null);
 
             dto.setChildren(new ArrayList<>());
 

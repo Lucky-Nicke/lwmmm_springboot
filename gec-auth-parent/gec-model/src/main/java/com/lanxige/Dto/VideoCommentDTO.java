@@ -14,7 +14,7 @@ public class VideoCommentDTO extends BaseEntity {
     // 评论id
     private Long id;
 
-    // 视频id
+    // 用户昵称
     private String userId;
 
     // 用户昵称

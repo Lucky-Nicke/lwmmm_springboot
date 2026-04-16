@@ -59,6 +59,7 @@
                m.cid        AS category
         FROM sys_movie m
                  LEFT JOIN video_stat s ON m.id = s.video_id
+                 INNER JOIN sys_user u ON m.director = u.username AND u.is_deleted = 0
         WHERE m.is_deleted = 0
           AND m.is_approval = '1'
         ORDER BY s.like_count DESC LIMIT 5
@@ -74,6 +75,7 @@
             m.cid AS category
         FROM sys_movie m
                  LEFT JOIN video_stat s ON m.id = s.video_id
+                 INNER JOIN sys_user u ON m.director = u.username AND u.is_deleted = 0
         WHERE m.is_deleted = 0
           AND m.is_approval = '1'
         ORDER BY s.visit_pv DESC

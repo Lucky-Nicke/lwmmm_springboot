@@ -106,5 +106,8 @@ public interface SysMovieService extends IService<SysMovie> {
 
     // 用户查看自己上传的视频
     List<SysMovie> showMyUploadVideo(String username);
+
+    // 下架视频（将 is_approval 置为 2）
+    boolean offShelfMovie(Long id);
 }
 

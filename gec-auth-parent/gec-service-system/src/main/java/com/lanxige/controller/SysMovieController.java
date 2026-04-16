@@ -109,6 +109,21 @@ public class SysMovieController {
         }
     }
 
+    // 下架视频
+    @OpenLog(title = "影视管理-下架",
+            businessType = BusinessType.UPDATE,
+            requestMethod = "Post")
+    @ApiOperation("根据id下架视频（is_approval 置为 2）")
+    @PostMapping("/offShelfMovie/{id}")
+    public Result offShelfMovie(@PathVariable Long id) {
+        boolean b = sysMovieService.offShelfMovie(id);
+        if (b) {
+            return Result.ok();
+        } else {
+            return Result.fail();
+        }
+    }
+
     // 播放视频根据id和播放秘钥
     @OpenLog(title = "影视管理-播放视频",
             businessType = BusinessType.OTHER,

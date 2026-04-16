@@ -24,9 +24,6 @@ public class UploadController {
     private VodTemplate vodTemplate;
 
     // 上传图片
-    @OpenLog(title = "上传-上传图片",
-            businessType = BusinessType.OTHER,
-            requestMethod = "Post")
     @RequestMapping(value = "/uploadImage")
     public Result uploadImage(MultipartFile uploadImage) throws IOException {
         long size = uploadImage.getSize();
@@ -48,9 +45,6 @@ public class UploadController {
     }
 
     // 上传视频操作
-    @OpenLog(title = "上传-上传视频",
-            businessType = BusinessType.OTHER,
-            requestMethod = "Post")
     @RequestMapping(value = "/uploadVideo")
     public String uploadVideo(MultipartFile uploadVideo) throws IOException {
         String videoId = this.vodTemplate.uploadVideo(uploadVideo.getOriginalFilename(), uploadVideo.getInputStream());

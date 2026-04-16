@@ -10,8 +10,10 @@ import com.lanxige.Req.*;
 import com.lanxige.Rsp.AllVideoInfoRsp;
 import com.lanxige.Rsp.VideoApproRsp;
 import com.lanxige.mapper.system.SysMovieMapper;
+import com.lanxige.mapper.system.SysUserMapper;
 import com.lanxige.mapper.video.*;
 import com.lanxige.model.system.SysMovie;
+import com.lanxige.model.system.SysUser;
 import com.lanxige.model.video.*;
 import com.lanxige.model.vo.SysMovieQueryVo;
 import com.lanxige.service.SysMovieService;
@@ -53,6 +55,9 @@ public class SysMovieServiceImpl extends ServiceImpl<SysMovieMapper, SysMovie> i
 
     @Autowired
     private VideoApproMapper videoApproMapper;
+
+    @Autowired
+    private SysUserMapper sysUserMapper;
 
     @Override
     public IPage<SysMovie> selectPage(IPage<SysMovie> p1, SysMovieQueryVo sysMovieQueryVo) {
@@ -206,7 +211,14 @@ public class SysMovieServiceImpl extends ServiceImpl<SysMovieMapper, SysMovie> i
 
         List<SysMovie> movieList = sysMovieMapper.selectList(wrapper);
 
-        return movieList.stream().map(movie -> {
+        return movieList.stream().filter(movie -> {
+            // 过滤掉作者已被删除的视频
+            long count = sysUserMapper.selectCount(
+                    new QueryWrapper<SysUser>()
+                            .eq("username", movie.getDirector())
+                            .eq("is_deleted", 0));
+            return count > 0;
+        }).map(movie -> {
 
             AllVideoInfoRsp rsp = new AllVideoInfoRsp();
             rsp.setId(movie.getId());
@@ -215,7 +227,6 @@ public class SysMovieServiceImpl extends ServiceImpl<SysMovieMapper, SysMovie> i
             rsp.setCoverUrl(movie.getImage());
             rsp.setCategory(movie.getCid());
 
-            // 目前没有播放量字段，先默认0
             VideoStat videoStat = videoStatMapper.selectOne(
                     new QueryWrapper<VideoStat>().eq("video_id", movie.getId()));
             rsp.setViews(videoStat.getPlayCount());
@@ -591,6 +602,13 @@ public class SysMovieServiceImpl extends ServiceImpl<SysMovieMapper, SysMovie> i
         wrapper.orderByDesc(SysMovie::getCreateTime);
         wrapper.eq(SysMovie::getDirector, username).eq(SysMovie::getIsDeleted, 0);
         return sysMovieMapper.selectList(wrapper);
+    }
+
+    @Override
+    public boolean offShelfMovie(Long id) {
+        LambdaUpdateWrapper<SysMovie> wrapper = new LambdaUpdateWrapper<>();
+        wrapper.eq(SysMovie::getId, id).set(SysMovie::getIsApproval, "2").set(SysMovie::getUpdateTime, new Date());
+        return this.update(wrapper);
     }
 }
 
