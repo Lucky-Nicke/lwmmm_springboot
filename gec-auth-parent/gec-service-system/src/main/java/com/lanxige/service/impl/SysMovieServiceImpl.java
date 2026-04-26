@@ -352,7 +352,7 @@ public class SysMovieServiceImpl extends ServiceImpl<SysMovieMapper, SysMovie> i
             } else if ("comment".equalsIgnoreCase(req.getLikeType())) {
                 videoCommentMapper.update(null,
                         new LambdaUpdateWrapper<VideoComment>()
-                                .eq(VideoComment::getId, req.getVideoId()) // videoId字段存评论id
+                                .eq(VideoComment::getId, req.getCommentId())
                                 .setSql("like_count = GREATEST(like_count - 1,0)"));
             }
 

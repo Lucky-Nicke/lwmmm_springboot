@@ -282,6 +282,8 @@ public class SysDateServiceImpl implements SysDateService {
             dto.setColor(d.getColor());
             dto.setCreateTime(d.getCreateTime());
             dto.setUserId(d.getUserId());
+            SysUser danmakuUser = sysUserMapper.selectById(d.getUserId());
+            dto.setNickname(danmakuUser != null ? danmakuUser.getName() : "已注销账户");
 
             danmakuDTOList.add(dto);
         }
@@ -313,7 +315,8 @@ public class SysDateServiceImpl implements SysDateService {
             dto.setRootId(c.getRootId());
 
             SysUser sysUser = sysUserMapper.selectById(c.getUserId());
-            dto.setUserId(sysUser != null ? sysUser.getName() : "已注销账户");
+            dto.setUserId(c.getUserId());
+            dto.setNickname(sysUser != null ? sysUser.getName() : "已注销账户");
             dto.setAvatar(sysUser != null ? sysUser.getHeadUrl() : null);
 
             dto.setChildren(new ArrayList<>());
@@ -343,7 +346,7 @@ public class SysDateServiceImpl implements SysDateService {
 
             if (parent != null) {
 
-                comment.setReplyToUser(parent.getUserId());
+                comment.setReplyToUser(parent.getNickname());
 
                 parent.getChildren().add(comment);
             }

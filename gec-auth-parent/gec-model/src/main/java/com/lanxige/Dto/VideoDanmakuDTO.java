@@ -34,4 +34,9 @@ public class VideoDanmakuDTO extends BaseEntity {
      */
     private Long userId;
 
+    /**
+     * 用户昵称
+     */
+    private String nickname;
+
 }
